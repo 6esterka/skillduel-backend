@@ -8,4 +8,6 @@ public class ErrorMessages {
     public static final String USER_ALREADY_IN_DUEL="You're already joined into the duel.";
     public static final String DUEL_ALREADY_STARTED="Duel already started.";
     public static final String USER_NOT_FOUND="User not found";
+    public static final String DUEL_NOT_FINISHED="Duel not finished.";
+    public static final String ALREADY_VOTED="Already voted.";
 }
