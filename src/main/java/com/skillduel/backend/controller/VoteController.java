@@ -3,6 +3,7 @@ package com.skillduel.backend.controller;
 import com.skillduel.backend.dto.vote.LeaderboardEntry;
 import com.skillduel.backend.dto.vote.VoteRequest;
 import com.skillduel.backend.service.VoteService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,7 +26,7 @@ public class VoteController {
     }
 
     @PostMapping("/duels/{duelId}/vote")
-    public ResponseEntity<Void> submitVote(@RequestBody VoteRequest voteRequest, @PathVariable UUID duelId, Principal principal){
+    public ResponseEntity<Void> submitVote(@Valid @RequestBody VoteRequest voteRequest, @PathVariable UUID duelId, Principal principal){
         voteService.submitVote(duelId,voteRequest.getVotedForUserId(),principal.getName());
         return ResponseEntity.ok().build();
     }

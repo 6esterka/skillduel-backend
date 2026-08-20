@@ -1,7 +1,9 @@
 package com.skillduel.backend.service;
 
 import com.skillduel.backend.dto.vote.LeaderboardEntry;
+import com.skillduel.backend.exception.BusinessException;
 import com.skillduel.backend.exception.ErrorMessages;
+import com.skillduel.backend.exception.ResourceNotFoundException;
 import com.skillduel.backend.model.Duel;
 import com.skillduel.backend.model.DuelStatus;
 import com.skillduel.backend.model.User;
@@ -29,7 +31,7 @@ public class VoteService {
     public void submitVote(UUID duelId, UUID votedForUserId, String voterEmail){
         Duel duel=this.findDuel(duelId);
         User voter=this.findVoter(voterEmail,duel);
-        User votedFor=userRepository.findById(votedForUserId).orElseThrow(()->new RuntimeException(ErrorMessages.USER_NOT_FOUND));
+        User votedFor=userRepository.findById(votedForUserId).orElseThrow(()->new ResourceNotFoundException(ErrorMessages.USER_NOT_FOUND));
         this.createVote(voter,duel,votedFor);
     }
 
@@ -38,17 +40,17 @@ public class VoteService {
     }
 
     private Duel findDuel(UUID duelId){
-        Duel duel=duelRepository.findById(duelId).orElseThrow(()->new RuntimeException(ErrorMessages.NO_DUEL_FOUND));
+        Duel duel=duelRepository.findById(duelId).orElseThrow(()->new ResourceNotFoundException(ErrorMessages.NO_DUEL_FOUND));
         if(!duel.getDuelStatus().equals(DuelStatus.FINISHED)){
-            throw new RuntimeException(ErrorMessages.DUEL_NOT_FINISHED);
+            throw new BusinessException(ErrorMessages.DUEL_NOT_FINISHED);
         }
         return duel;
     }
 
     private User findVoter(String voterEmail,Duel duel){
-        User voter=userRepository.findByEmail(voterEmail).orElseThrow(()->new RuntimeException(ErrorMessages.USER_NOT_FOUND));
+        User voter=userRepository.findByEmail(voterEmail).orElseThrow(()->new ResourceNotFoundException(ErrorMessages.USER_NOT_FOUND));
         if(voteRepository.existsByDuelAndVoter(duel,voter)){
-            throw new RuntimeException(ErrorMessages.ALREADY_VOTED);
+            throw new BusinessException(ErrorMessages.ALREADY_VOTED);
         }
         return voter;
     }

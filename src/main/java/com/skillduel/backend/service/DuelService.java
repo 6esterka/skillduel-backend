@@ -2,7 +2,9 @@ package com.skillduel.backend.service;
 
 import com.skillduel.backend.dto.CreateDuelRequest;
 import com.skillduel.backend.dto.DuelResponse;
+import com.skillduel.backend.exception.BusinessException;
 import com.skillduel.backend.exception.ErrorMessages;
+import com.skillduel.backend.exception.ResourceNotFoundException;
 import com.skillduel.backend.model.Duel;
 import com.skillduel.backend.model.DuelParticipant;
 import com.skillduel.backend.model.DuelStatus;
@@ -40,7 +42,7 @@ public class DuelService {
     private Task getRandomTask(CreateDuelRequest createDuelRequest){
         List<Task> tasks=taskRepository.findByDifficulty(createDuelRequest.getDifficulty());
         if(tasks.isEmpty()){
-            throw new RuntimeException(ErrorMessages.NO_TASKS_FOUND_BY_DIFFICULTY);
+            throw new ResourceNotFoundException(ErrorMessages.NO_TASKS_FOUND_BY_DIFFICULTY);
         }
         return tasks.get(new Random().nextInt(tasks.size()));
     }
@@ -61,12 +63,12 @@ public class DuelService {
     }
 
     public DuelResponse joinDuel(UUID duelId,User currentUser){
-        Duel duel=duelRepository.findById(duelId).orElseThrow(()->new RuntimeException(ErrorMessages.NO_DUEL_FOUND));
+        Duel duel=duelRepository.findById(duelId).orElseThrow(()->new ResourceNotFoundException(ErrorMessages.NO_DUEL_FOUND));
         if(duel.getDuelStatus()!=DuelStatus.WAITING){
-            throw new RuntimeException(ErrorMessages.DUEL_ALREADY_STARTED);
+            throw new BusinessException(ErrorMessages.DUEL_ALREADY_STARTED);
         }
         if(duelParticipantRepository.existsByDuelAndUser(duel,currentUser)){
-            throw new RuntimeException(ErrorMessages.USER_ALREADY_IN_DUEL);
+            throw new BusinessException(ErrorMessages.USER_ALREADY_IN_DUEL);
         }
         this.saveDuelParticipant(duel,currentUser);
         duel.setDuelStatus(DuelStatus.ACTIVE);
@@ -75,7 +77,7 @@ public class DuelService {
     }
 
     public DuelResponse getDuel(UUID duelId){
-        Duel duel=duelRepository.findById(duelId).orElseThrow(()->new RuntimeException(ErrorMessages.NO_DUEL_FOUND));
+        Duel duel=duelRepository.findById(duelId).orElseThrow(()->new ResourceNotFoundException(ErrorMessages.NO_DUEL_FOUND));
         return new DuelResponse(duel.getId(),duel.getCreatedAt(),duel.getDuelStatus(),duel.getTask().getId());
     }
 

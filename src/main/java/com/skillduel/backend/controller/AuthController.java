@@ -4,6 +4,7 @@ import com.skillduel.backend.dto.AuthResponse;
 import com.skillduel.backend.dto.LoginRequest;
 import com.skillduel.backend.dto.RegisterRequest;
 import com.skillduel.backend.service.AuthService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,13 +22,13 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<AuthResponse> register(@RequestBody RegisterRequest registerRequest){
+    public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest registerRequest){
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(authService.register(registerRequest));
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthResponse> login(@RequestBody LoginRequest loginRequest){
+    public ResponseEntity<AuthResponse> login (@Valid @RequestBody LoginRequest loginRequest){
         return ResponseEntity.ok(authService.login(loginRequest));
     }
 
