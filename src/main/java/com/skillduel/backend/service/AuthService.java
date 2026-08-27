@@ -3,6 +3,7 @@ package com.skillduel.backend.service;
 import com.skillduel.backend.dto.AuthResponse;
 import com.skillduel.backend.dto.LoginRequest;
 import com.skillduel.backend.dto.RegisterRequest;
+import com.skillduel.backend.exception.BusinessException;
 import com.skillduel.backend.exception.ErrorMessages;
 import com.skillduel.backend.model.User;
 import com.skillduel.backend.repository.UserRepository;
@@ -24,6 +25,9 @@ public class AuthService {
     }
 
     public AuthResponse register(RegisterRequest request){
+        if(userRepository.findByEmail(request.getEmail()).isPresent()){
+            throw new BusinessException(ErrorMessages.EMAIL_ALREADY_EXISTS);
+        }
         User user=new User();
         String encodedPassword=passwordEncoder.encode(request.getPassword());
         user.setEmail(request.getEmail());
