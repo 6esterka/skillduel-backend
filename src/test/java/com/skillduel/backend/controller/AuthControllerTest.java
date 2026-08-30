@@ -1,24 +1,14 @@
 package com.skillduel.backend.controller;
 
-import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
 
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest
-@AutoConfigureMockMvc
-@Transactional
-class AuthControllerTest {
-    @Autowired
-    MockMvc mockMvc;
+class AuthControllerTest extends BaseControllerTest {
 
     @Test
     void register_shouldReturn201AndToken() throws Exception{
@@ -37,15 +27,7 @@ class AuthControllerTest {
 
     @Test
     void login_shouldReturn200AndToken() throws Exception{
-        mockMvc.perform(post("/api/auth/register")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("""
-                          {
-                              "username": "testuser2",
-                              "email":"testuser2@test.com",
-                              "password": "secret123"
-                          }
-                          """));
+        registerAndGetToken("testuser2","testuser2@test.com");
         mockMvc.perform(post("/api/auth/login")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
