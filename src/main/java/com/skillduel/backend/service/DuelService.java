@@ -35,7 +35,7 @@ public class DuelService {
     public DuelResponse createDuel(CreateDuelRequest createDuelRequest, User currentUser){
         Task task=this.getRandomTask(createDuelRequest);
         Duel createdDuel=this.saveDuel(task);
-        this.saveDuelParticipant(createdDuel,currentUser);
+        this.saveDuelParticipantByRole(createdDuel,currentUser,ParticipantRole.PLAYER);
         return new DuelResponse(createdDuel.getId(),createdDuel.getCreatedAt(),createdDuel.getDuelStatus(),createdDuel.getTask().getId());
     }
 
@@ -54,12 +54,24 @@ public class DuelService {
         return duelRepository.save(newDuel);
     }
 
-    private void saveDuelParticipant(Duel duel,User currentUser){
+    private void saveDuelParticipantByRole(Duel duel,User currentUser,ParticipantRole role){
         DuelParticipant duelParticipant=new DuelParticipant();
         duelParticipant.setDuel(duel);
         duelParticipant.setUser(currentUser);
-        duelParticipant.setRole(ParticipantRole.PLAYER);
+        duelParticipant.setRole(role);
         duelParticipantRepository.save(duelParticipant);
+    }
+
+    public DuelResponse joinDuelAsSpectator(UUID duelId,User currentUser){
+        Duel duel=duelRepository.findById(duelId).orElseThrow(()->new ResourceNotFoundException(ErrorMessages.NO_DUEL_FOUND));
+        if(duel.getDuelStatus()!=DuelStatus.ACTIVE){
+            throw new BusinessException(ErrorMessages.DUEL_NOT_STARTED);
+        }
+        if(duelParticipantRepository.existsByDuelAndUser(duel,currentUser)){
+            throw new BusinessException(ErrorMessages.USER_ALREADY_IN_DUEL);
+        }
+        this.saveDuelParticipantByRole(duel,currentUser,ParticipantRole.SPECTATOR);
+        return new DuelResponse(duel.getId(),duel.getCreatedAt(),duel.getDuelStatus(),duel.getTask().getId());
     }
 
     public DuelResponse joinDuel(UUID duelId,User currentUser){
@@ -70,7 +82,7 @@ public class DuelService {
         if(duelParticipantRepository.existsByDuelAndUser(duel,currentUser)){
             throw new BusinessException(ErrorMessages.USER_ALREADY_IN_DUEL);
         }
-        this.saveDuelParticipant(duel,currentUser);
+        this.saveDuelParticipantByRole(duel,currentUser,ParticipantRole.PLAYER);
         duel.setDuelStatus(DuelStatus.ACTIVE);
         duelRepository.save(duel);
         return new DuelResponse(duel.getId(),duel.getCreatedAt(),duel.getDuelStatus(),duel.getTask().getId());

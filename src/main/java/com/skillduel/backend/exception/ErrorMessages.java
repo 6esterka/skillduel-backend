@@ -11,4 +11,6 @@ public class ErrorMessages {
     public static final String DUEL_NOT_FINISHED="Duel not finished.";
     public static final String ALREADY_VOTED="Already voted.";
     public static final String EMAIL_ALREADY_EXISTS = "Email already registered.";
+    public static final String DUEL_NOT_STARTED="Duel is not active.";
+    public static final String ONLY_SPECTATORS_CAN_VOTE="Only spectators can vote for winner of the duel.";
 }

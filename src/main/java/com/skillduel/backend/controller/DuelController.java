@@ -49,6 +49,9 @@ public class DuelController {
     public ResponseEntity<List<DuelResponse>> getDuelsByStatus(@RequestParam DuelStatus duelStatus){
         return ResponseEntity.ok(duelService.getDuelsByStatus(duelStatus));
     }
-
+    @PostMapping("/{duelId}/spectate")
+    public ResponseEntity<DuelResponse> joinDuelAsSpectator(@PathVariable UUID duelId,@AuthenticationPrincipal User currentUser){
+        return ResponseEntity.ok(duelService.joinDuelAsSpectator(duelId,currentUser));
+    }
 
 }
